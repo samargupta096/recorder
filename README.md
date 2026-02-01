@@ -1,5 +1,7 @@
 # SafeCall Recorder
 
+![Visitors](https://komarev.com/ghpvc/?username=Samarpitgupta&repo=recorder&label=Visitors&color=0e75b6&style=flat)
+
 A production-ready Android app (Java) for legal and transparent phone call recording with encrypted local storage and Google Drive backup.
 
 ## Features
