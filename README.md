@@ -178,6 +178,3 @@ Call recording can only be tested on a physical device (not emulator):
 - **Background Work**: WorkManager
 - **Cloud**: Google Drive API
 
-## License
-
-MIT License - See LICENSE file for details.
