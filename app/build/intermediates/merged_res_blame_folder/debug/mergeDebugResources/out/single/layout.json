@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-mergeDebugResources-47:/layout/activity_recording_details.xml",
+        "source": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-main-50:/layout/activity_recording_details.xml"
+    },
+    {
+        "merged": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-mergeDebugResources-47:/layout/metadata_row.xml",
+        "source": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-main-50:/layout/metadata_row.xml"
+    },
+    {
+        "merged": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-mergeDebugResources-47:/layout/item_recording.xml",
+        "source": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-main-50:/layout/item_recording.xml"
+    },
+    {
+        "merged": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-mergeDebugResources-47:/layout/activity_settings.xml",
+        "source": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-main-50:/layout/activity_settings.xml"
+    },
+    {
+        "merged": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-mergeDebugResources-47:/layout/activity_main.xml",
+        "source": "/home/samarpit/.gradle/daemon/9.1.0/com.safecall.recorder.app-main-50:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.safecall.recorder.app-mergeDebugResources-47:/layout/activity_settings.xml",
+        "source": "com.safecall.recorder.app-main-50:/layout/activity_settings.xml"
+    }
+]
