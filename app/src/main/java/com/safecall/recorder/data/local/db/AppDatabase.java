@@ -11,7 +11,7 @@ import androidx.room.RoomDatabase;
  */
 @Database(
     entities = {RecordingEntity.class},
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -41,7 +41,18 @@ public abstract class AppDatabase extends RoomDatabase {
                 AppDatabase.class,
                 DATABASE_NAME
         )
+                .addMigrations(MIGRATION_1_2)
                 .fallbackToDestructiveMigration()
                 .build();
     }
+
+    static final androidx.room.migration.Migration MIGRATION_1_2 = new androidx.room.migration.Migration(1, 2) {
+        @Override
+        public void migrate(androidx.sqlite.db.SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE recordings ADD COLUMN transcription TEXT");
+            database.execSQL("ALTER TABLE recordings ADD COLUMN tag TEXT");
+            database.execSQL("ALTER TABLE recordings ADD COLUMN isDeleted INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE recordings ADD COLUMN deletedAt INTEGER NOT NULL DEFAULT 0");
+        }
+    };
 }

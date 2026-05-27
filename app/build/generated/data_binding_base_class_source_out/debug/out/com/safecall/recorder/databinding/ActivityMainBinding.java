@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.safecall.recorder.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -25,15 +26,20 @@ public final class ActivityMainBinding implements ViewBinding {
   public final LinearLayout emptyState;
 
   @NonNull
+  public final FloatingActionButton fabRecord;
+
+  @NonNull
   public final RecyclerView recyclerView;
 
   @NonNull
   public final MaterialToolbar toolbar;
 
   private ActivityMainBinding(@NonNull CoordinatorLayout rootView, @NonNull LinearLayout emptyState,
-      @NonNull RecyclerView recyclerView, @NonNull MaterialToolbar toolbar) {
+      @NonNull FloatingActionButton fabRecord, @NonNull RecyclerView recyclerView,
+      @NonNull MaterialToolbar toolbar) {
     this.rootView = rootView;
     this.emptyState = emptyState;
+    this.fabRecord = fabRecord;
     this.recyclerView = recyclerView;
     this.toolbar = toolbar;
   }
@@ -71,6 +77,12 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.fab_record;
+      FloatingActionButton fabRecord = ViewBindings.findChildViewById(rootView, id);
+      if (fabRecord == null) {
+        break missingId;
+      }
+
       id = R.id.recycler_view;
       RecyclerView recyclerView = ViewBindings.findChildViewById(rootView, id);
       if (recyclerView == null) {
@@ -83,8 +95,8 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((CoordinatorLayout) rootView, emptyState, recyclerView,
-          toolbar);
+      return new ActivityMainBinding((CoordinatorLayout) rootView, emptyState, fabRecord,
+          recyclerView, toolbar);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

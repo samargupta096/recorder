@@ -68,6 +68,15 @@ public final class ActivityRecordingDetailsBinding implements ViewBinding {
   public final SeekBar seekBar;
 
   @NonNull
+  public final MaterialButton skipBackwardButton;
+
+  @NonNull
+  public final MaterialButton skipForwardButton;
+
+  @NonNull
+  public final MaterialButton speedButton;
+
+  @NonNull
   public final TextView timestamp;
 
   @NonNull
@@ -82,7 +91,9 @@ public final class ActivityRecordingDetailsBinding implements ViewBinding {
       @NonNull MaterialButton favoriteButton, @NonNull TextView fileSize, @NonNull TextView name,
       @NonNull TextInputEditText notesInput, @NonNull TextView phoneNumber,
       @NonNull FloatingActionButton playButton, @NonNull MetadataRowBinding rowDuration,
-      @NonNull SeekBar seekBar, @NonNull TextView timestamp, @NonNull MaterialToolbar toolbar,
+      @NonNull SeekBar seekBar, @NonNull MaterialButton skipBackwardButton,
+      @NonNull MaterialButton skipForwardButton, @NonNull MaterialButton speedButton,
+      @NonNull TextView timestamp, @NonNull MaterialToolbar toolbar,
       @NonNull TextView totalDuration) {
     this.rootView = rootView;
     this.backedUp = backedUp;
@@ -99,6 +110,9 @@ public final class ActivityRecordingDetailsBinding implements ViewBinding {
     this.playButton = playButton;
     this.rowDuration = rowDuration;
     this.seekBar = seekBar;
+    this.skipBackwardButton = skipBackwardButton;
+    this.skipForwardButton = skipForwardButton;
+    this.speedButton = speedButton;
     this.timestamp = timestamp;
     this.toolbar = toolbar;
     this.totalDuration = totalDuration;
@@ -216,6 +230,24 @@ public final class ActivityRecordingDetailsBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.skip_backward_button;
+      MaterialButton skipBackwardButton = ViewBindings.findChildViewById(rootView, id);
+      if (skipBackwardButton == null) {
+        break missingId;
+      }
+
+      id = R.id.skip_forward_button;
+      MaterialButton skipForwardButton = ViewBindings.findChildViewById(rootView, id);
+      if (skipForwardButton == null) {
+        break missingId;
+      }
+
+      id = R.id.speed_button;
+      MaterialButton speedButton = ViewBindings.findChildViewById(rootView, id);
+      if (speedButton == null) {
+        break missingId;
+      }
+
       id = R.id.timestamp;
       TextView timestamp = ViewBindings.findChildViewById(rootView, id);
       if (timestamp == null) {
@@ -236,8 +268,8 @@ public final class ActivityRecordingDetailsBinding implements ViewBinding {
 
       return new ActivityRecordingDetailsBinding((CoordinatorLayout) rootView, backedUp, callType,
           callTypeIcon, currentPosition, duration, encrypted, favoriteButton, fileSize, name,
-          notesInput, phoneNumber, playButton, binding_rowDuration, seekBar, timestamp, toolbar,
-          totalDuration);
+          notesInput, phoneNumber, playButton, binding_rowDuration, seekBar, skipBackwardButton,
+          skipForwardButton, speedButton, timestamp, toolbar, totalDuration);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

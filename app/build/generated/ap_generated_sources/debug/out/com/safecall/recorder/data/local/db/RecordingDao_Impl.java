@@ -45,6 +45,10 @@ public final class RecordingDao_Impl implements RecordingDao {
 
   private final SharedSQLiteStatement __preparedStmtOfUpdateNotes;
 
+  private final SharedSQLiteStatement __preparedStmtOfMoveToRecycleBin;
+
+  private final SharedSQLiteStatement __preparedStmtOfRestoreFromRecycleBin;
+
   private final SharedSQLiteStatement __preparedStmtOfDeleteAllRecordings;
 
   public RecordingDao_Impl(@NonNull final RoomDatabase __db) {
@@ -53,7 +57,7 @@ public final class RecordingDao_Impl implements RecordingDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `recordings` (`id`,`filePath`,`contactName`,`phoneNumber`,`isIncoming`,`timestamp`,`duration`,`fileSize`,`isEncrypted`,`isBackedUp`,`customName`,`driveFileId`,`isFavorite`,`notes`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `recordings` (`id`,`filePath`,`contactName`,`phoneNumber`,`isIncoming`,`timestamp`,`duration`,`fileSize`,`isEncrypted`,`isBackedUp`,`customName`,`driveFileId`,`isFavorite`,`notes`,`transcription`,`tag`,`isDeleted`,`deletedAt`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -101,6 +105,19 @@ public final class RecordingDao_Impl implements RecordingDao {
         } else {
           statement.bindString(14, entity.getNotes());
         }
+        if (entity.getTranscription() == null) {
+          statement.bindNull(15);
+        } else {
+          statement.bindString(15, entity.getTranscription());
+        }
+        if (entity.getTag() == null) {
+          statement.bindNull(16);
+        } else {
+          statement.bindString(16, entity.getTag());
+        }
+        final int _tmp_4 = entity.isDeleted() ? 1 : 0;
+        statement.bindLong(17, _tmp_4);
+        statement.bindLong(18, entity.getDeletedAt());
       }
     };
     this.__deletionAdapterOfRecordingEntity = new EntityDeletionOrUpdateAdapter<RecordingEntity>(__db) {
@@ -120,7 +137,7 @@ public final class RecordingDao_Impl implements RecordingDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `recordings` SET `id` = ?,`filePath` = ?,`contactName` = ?,`phoneNumber` = ?,`isIncoming` = ?,`timestamp` = ?,`duration` = ?,`fileSize` = ?,`isEncrypted` = ?,`isBackedUp` = ?,`customName` = ?,`driveFileId` = ?,`isFavorite` = ?,`notes` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `recordings` SET `id` = ?,`filePath` = ?,`contactName` = ?,`phoneNumber` = ?,`isIncoming` = ?,`timestamp` = ?,`duration` = ?,`fileSize` = ?,`isEncrypted` = ?,`isBackedUp` = ?,`customName` = ?,`driveFileId` = ?,`isFavorite` = ?,`notes` = ?,`transcription` = ?,`tag` = ?,`isDeleted` = ?,`deletedAt` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -168,7 +185,20 @@ public final class RecordingDao_Impl implements RecordingDao {
         } else {
           statement.bindString(14, entity.getNotes());
         }
-        statement.bindLong(15, entity.getId());
+        if (entity.getTranscription() == null) {
+          statement.bindNull(15);
+        } else {
+          statement.bindString(15, entity.getTranscription());
+        }
+        if (entity.getTag() == null) {
+          statement.bindNull(16);
+        } else {
+          statement.bindString(16, entity.getTag());
+        }
+        final int _tmp_4 = entity.isDeleted() ? 1 : 0;
+        statement.bindLong(17, _tmp_4);
+        statement.bindLong(18, entity.getDeletedAt());
+        statement.bindLong(19, entity.getId());
       }
     };
     this.__preparedStmtOfDeleteRecordingById = new SharedSQLiteStatement(__db) {
@@ -208,6 +238,22 @@ public final class RecordingDao_Impl implements RecordingDao {
       @NonNull
       public String createQuery() {
         final String _query = "UPDATE recordings SET notes = ? WHERE id = ?";
+        return _query;
+      }
+    };
+    this.__preparedStmtOfMoveToRecycleBin = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "UPDATE recordings SET isDeleted = 1, deletedAt = ? WHERE id = ?";
+        return _query;
+      }
+    };
+    this.__preparedStmtOfRestoreFromRecycleBin = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "UPDATE recordings SET isDeleted = 0, deletedAt = 0 WHERE id = ?";
         return _query;
       }
     };
@@ -375,6 +421,46 @@ public final class RecordingDao_Impl implements RecordingDao {
   }
 
   @Override
+  public void moveToRecycleBin(final long id, final long timestamp) {
+    __db.assertNotSuspendingTransaction();
+    final SupportSQLiteStatement _stmt = __preparedStmtOfMoveToRecycleBin.acquire();
+    int _argIndex = 1;
+    _stmt.bindLong(_argIndex, timestamp);
+    _argIndex = 2;
+    _stmt.bindLong(_argIndex, id);
+    try {
+      __db.beginTransaction();
+      try {
+        _stmt.executeUpdateDelete();
+        __db.setTransactionSuccessful();
+      } finally {
+        __db.endTransaction();
+      }
+    } finally {
+      __preparedStmtOfMoveToRecycleBin.release(_stmt);
+    }
+  }
+
+  @Override
+  public void restoreFromRecycleBin(final long id) {
+    __db.assertNotSuspendingTransaction();
+    final SupportSQLiteStatement _stmt = __preparedStmtOfRestoreFromRecycleBin.acquire();
+    int _argIndex = 1;
+    _stmt.bindLong(_argIndex, id);
+    try {
+      __db.beginTransaction();
+      try {
+        _stmt.executeUpdateDelete();
+        __db.setTransactionSuccessful();
+      } finally {
+        __db.endTransaction();
+      }
+    } finally {
+      __preparedStmtOfRestoreFromRecycleBin.release(_stmt);
+    }
+  }
+
+  @Override
   public void deleteAllRecordings() {
     __db.assertNotSuspendingTransaction();
     final SupportSQLiteStatement _stmt = __preparedStmtOfDeleteAllRecordings.acquire();
@@ -393,7 +479,7 @@ public final class RecordingDao_Impl implements RecordingDao {
 
   @Override
   public LiveData<List<RecordingEntity>> getAllRecordings() {
-    final String _sql = "SELECT * FROM recordings ORDER BY timestamp DESC";
+    final String _sql = "SELECT * FROM recordings WHERE isDeleted = 0 ORDER BY timestamp DESC";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
     return __db.getInvalidationTracker().createLiveData(new String[] {"recordings"}, false, new Callable<List<RecordingEntity>>() {
       @Override
@@ -415,6 +501,10 @@ public final class RecordingDao_Impl implements RecordingDao {
           final int _cursorIndexOfDriveFileId = CursorUtil.getColumnIndexOrThrow(_cursor, "driveFileId");
           final int _cursorIndexOfIsFavorite = CursorUtil.getColumnIndexOrThrow(_cursor, "isFavorite");
           final int _cursorIndexOfNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "notes");
+          final int _cursorIndexOfTranscription = CursorUtil.getColumnIndexOrThrow(_cursor, "transcription");
+          final int _cursorIndexOfTag = CursorUtil.getColumnIndexOrThrow(_cursor, "tag");
+          final int _cursorIndexOfIsDeleted = CursorUtil.getColumnIndexOrThrow(_cursor, "isDeleted");
+          final int _cursorIndexOfDeletedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "deletedAt");
           final List<RecordingEntity> _result = new ArrayList<RecordingEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final RecordingEntity _item;
@@ -493,6 +583,28 @@ public final class RecordingDao_Impl implements RecordingDao {
               _tmpNotes = _cursor.getString(_cursorIndexOfNotes);
             }
             _item.setNotes(_tmpNotes);
+            final String _tmpTranscription;
+            if (_cursor.isNull(_cursorIndexOfTranscription)) {
+              _tmpTranscription = null;
+            } else {
+              _tmpTranscription = _cursor.getString(_cursorIndexOfTranscription);
+            }
+            _item.setTranscription(_tmpTranscription);
+            final String _tmpTag;
+            if (_cursor.isNull(_cursorIndexOfTag)) {
+              _tmpTag = null;
+            } else {
+              _tmpTag = _cursor.getString(_cursorIndexOfTag);
+            }
+            _item.setTag(_tmpTag);
+            final boolean _tmpIsDeleted;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsDeleted);
+            _tmpIsDeleted = _tmp_4 != 0;
+            _item.setDeleted(_tmpIsDeleted);
+            final long _tmpDeletedAt;
+            _tmpDeletedAt = _cursor.getLong(_cursorIndexOfDeletedAt);
+            _item.setDeletedAt(_tmpDeletedAt);
             _result.add(_item);
           }
           return _result;
@@ -531,6 +643,10 @@ public final class RecordingDao_Impl implements RecordingDao {
       final int _cursorIndexOfDriveFileId = CursorUtil.getColumnIndexOrThrow(_cursor, "driveFileId");
       final int _cursorIndexOfIsFavorite = CursorUtil.getColumnIndexOrThrow(_cursor, "isFavorite");
       final int _cursorIndexOfNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "notes");
+      final int _cursorIndexOfTranscription = CursorUtil.getColumnIndexOrThrow(_cursor, "transcription");
+      final int _cursorIndexOfTag = CursorUtil.getColumnIndexOrThrow(_cursor, "tag");
+      final int _cursorIndexOfIsDeleted = CursorUtil.getColumnIndexOrThrow(_cursor, "isDeleted");
+      final int _cursorIndexOfDeletedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "deletedAt");
       final RecordingEntity _result;
       if (_cursor.moveToFirst()) {
         _result = new RecordingEntity();
@@ -608,6 +724,28 @@ public final class RecordingDao_Impl implements RecordingDao {
           _tmpNotes = _cursor.getString(_cursorIndexOfNotes);
         }
         _result.setNotes(_tmpNotes);
+        final String _tmpTranscription;
+        if (_cursor.isNull(_cursorIndexOfTranscription)) {
+          _tmpTranscription = null;
+        } else {
+          _tmpTranscription = _cursor.getString(_cursorIndexOfTranscription);
+        }
+        _result.setTranscription(_tmpTranscription);
+        final String _tmpTag;
+        if (_cursor.isNull(_cursorIndexOfTag)) {
+          _tmpTag = null;
+        } else {
+          _tmpTag = _cursor.getString(_cursorIndexOfTag);
+        }
+        _result.setTag(_tmpTag);
+        final boolean _tmpIsDeleted;
+        final int _tmp_4;
+        _tmp_4 = _cursor.getInt(_cursorIndexOfIsDeleted);
+        _tmpIsDeleted = _tmp_4 != 0;
+        _result.setDeleted(_tmpIsDeleted);
+        final long _tmpDeletedAt;
+        _tmpDeletedAt = _cursor.getLong(_cursorIndexOfDeletedAt);
+        _result.setDeletedAt(_tmpDeletedAt);
       } else {
         _result = null;
       }
@@ -644,6 +782,10 @@ public final class RecordingDao_Impl implements RecordingDao {
           final int _cursorIndexOfDriveFileId = CursorUtil.getColumnIndexOrThrow(_cursor, "driveFileId");
           final int _cursorIndexOfIsFavorite = CursorUtil.getColumnIndexOrThrow(_cursor, "isFavorite");
           final int _cursorIndexOfNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "notes");
+          final int _cursorIndexOfTranscription = CursorUtil.getColumnIndexOrThrow(_cursor, "transcription");
+          final int _cursorIndexOfTag = CursorUtil.getColumnIndexOrThrow(_cursor, "tag");
+          final int _cursorIndexOfIsDeleted = CursorUtil.getColumnIndexOrThrow(_cursor, "isDeleted");
+          final int _cursorIndexOfDeletedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "deletedAt");
           final RecordingEntity _result;
           if (_cursor.moveToFirst()) {
             _result = new RecordingEntity();
@@ -721,6 +863,28 @@ public final class RecordingDao_Impl implements RecordingDao {
               _tmpNotes = _cursor.getString(_cursorIndexOfNotes);
             }
             _result.setNotes(_tmpNotes);
+            final String _tmpTranscription;
+            if (_cursor.isNull(_cursorIndexOfTranscription)) {
+              _tmpTranscription = null;
+            } else {
+              _tmpTranscription = _cursor.getString(_cursorIndexOfTranscription);
+            }
+            _result.setTranscription(_tmpTranscription);
+            final String _tmpTag;
+            if (_cursor.isNull(_cursorIndexOfTag)) {
+              _tmpTag = null;
+            } else {
+              _tmpTag = _cursor.getString(_cursorIndexOfTag);
+            }
+            _result.setTag(_tmpTag);
+            final boolean _tmpIsDeleted;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsDeleted);
+            _tmpIsDeleted = _tmp_4 != 0;
+            _result.setDeleted(_tmpIsDeleted);
+            final long _tmpDeletedAt;
+            _tmpDeletedAt = _cursor.getLong(_cursorIndexOfDeletedAt);
+            _result.setDeletedAt(_tmpDeletedAt);
           } else {
             _result = null;
           }
@@ -779,6 +943,10 @@ public final class RecordingDao_Impl implements RecordingDao {
           final int _cursorIndexOfDriveFileId = CursorUtil.getColumnIndexOrThrow(_cursor, "driveFileId");
           final int _cursorIndexOfIsFavorite = CursorUtil.getColumnIndexOrThrow(_cursor, "isFavorite");
           final int _cursorIndexOfNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "notes");
+          final int _cursorIndexOfTranscription = CursorUtil.getColumnIndexOrThrow(_cursor, "transcription");
+          final int _cursorIndexOfTag = CursorUtil.getColumnIndexOrThrow(_cursor, "tag");
+          final int _cursorIndexOfIsDeleted = CursorUtil.getColumnIndexOrThrow(_cursor, "isDeleted");
+          final int _cursorIndexOfDeletedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "deletedAt");
           final List<RecordingEntity> _result = new ArrayList<RecordingEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final RecordingEntity _item;
@@ -857,6 +1025,28 @@ public final class RecordingDao_Impl implements RecordingDao {
               _tmpNotes = _cursor.getString(_cursorIndexOfNotes);
             }
             _item.setNotes(_tmpNotes);
+            final String _tmpTranscription;
+            if (_cursor.isNull(_cursorIndexOfTranscription)) {
+              _tmpTranscription = null;
+            } else {
+              _tmpTranscription = _cursor.getString(_cursorIndexOfTranscription);
+            }
+            _item.setTranscription(_tmpTranscription);
+            final String _tmpTag;
+            if (_cursor.isNull(_cursorIndexOfTag)) {
+              _tmpTag = null;
+            } else {
+              _tmpTag = _cursor.getString(_cursorIndexOfTag);
+            }
+            _item.setTag(_tmpTag);
+            final boolean _tmpIsDeleted;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsDeleted);
+            _tmpIsDeleted = _tmp_4 != 0;
+            _item.setDeleted(_tmpIsDeleted);
+            final long _tmpDeletedAt;
+            _tmpDeletedAt = _cursor.getLong(_cursorIndexOfDeletedAt);
+            _item.setDeletedAt(_tmpDeletedAt);
             _result.add(_item);
           }
           return _result;
@@ -893,6 +1083,10 @@ public final class RecordingDao_Impl implements RecordingDao {
       final int _cursorIndexOfDriveFileId = CursorUtil.getColumnIndexOrThrow(_cursor, "driveFileId");
       final int _cursorIndexOfIsFavorite = CursorUtil.getColumnIndexOrThrow(_cursor, "isFavorite");
       final int _cursorIndexOfNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "notes");
+      final int _cursorIndexOfTranscription = CursorUtil.getColumnIndexOrThrow(_cursor, "transcription");
+      final int _cursorIndexOfTag = CursorUtil.getColumnIndexOrThrow(_cursor, "tag");
+      final int _cursorIndexOfIsDeleted = CursorUtil.getColumnIndexOrThrow(_cursor, "isDeleted");
+      final int _cursorIndexOfDeletedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "deletedAt");
       final List<RecordingEntity> _result = new ArrayList<RecordingEntity>(_cursor.getCount());
       while (_cursor.moveToNext()) {
         final RecordingEntity _item;
@@ -971,6 +1165,28 @@ public final class RecordingDao_Impl implements RecordingDao {
           _tmpNotes = _cursor.getString(_cursorIndexOfNotes);
         }
         _item.setNotes(_tmpNotes);
+        final String _tmpTranscription;
+        if (_cursor.isNull(_cursorIndexOfTranscription)) {
+          _tmpTranscription = null;
+        } else {
+          _tmpTranscription = _cursor.getString(_cursorIndexOfTranscription);
+        }
+        _item.setTranscription(_tmpTranscription);
+        final String _tmpTag;
+        if (_cursor.isNull(_cursorIndexOfTag)) {
+          _tmpTag = null;
+        } else {
+          _tmpTag = _cursor.getString(_cursorIndexOfTag);
+        }
+        _item.setTag(_tmpTag);
+        final boolean _tmpIsDeleted;
+        final int _tmp_4;
+        _tmp_4 = _cursor.getInt(_cursorIndexOfIsDeleted);
+        _tmpIsDeleted = _tmp_4 != 0;
+        _item.setDeleted(_tmpIsDeleted);
+        final long _tmpDeletedAt;
+        _tmpDeletedAt = _cursor.getLong(_cursorIndexOfDeletedAt);
+        _item.setDeletedAt(_tmpDeletedAt);
         _result.add(_item);
       }
       return _result;
@@ -1024,6 +1240,149 @@ public final class RecordingDao_Impl implements RecordingDao {
       _cursor.close();
       _statement.release();
     }
+  }
+
+  @Override
+  public LiveData<List<RecordingEntity>> getDeletedRecordings() {
+    final String _sql = "SELECT * FROM recordings WHERE isDeleted = 1 ORDER BY deletedAt DESC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    return __db.getInvalidationTracker().createLiveData(new String[] {"recordings"}, false, new Callable<List<RecordingEntity>>() {
+      @Override
+      @Nullable
+      public List<RecordingEntity> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfFilePath = CursorUtil.getColumnIndexOrThrow(_cursor, "filePath");
+          final int _cursorIndexOfContactName = CursorUtil.getColumnIndexOrThrow(_cursor, "contactName");
+          final int _cursorIndexOfPhoneNumber = CursorUtil.getColumnIndexOrThrow(_cursor, "phoneNumber");
+          final int _cursorIndexOfIsIncoming = CursorUtil.getColumnIndexOrThrow(_cursor, "isIncoming");
+          final int _cursorIndexOfTimestamp = CursorUtil.getColumnIndexOrThrow(_cursor, "timestamp");
+          final int _cursorIndexOfDuration = CursorUtil.getColumnIndexOrThrow(_cursor, "duration");
+          final int _cursorIndexOfFileSize = CursorUtil.getColumnIndexOrThrow(_cursor, "fileSize");
+          final int _cursorIndexOfIsEncrypted = CursorUtil.getColumnIndexOrThrow(_cursor, "isEncrypted");
+          final int _cursorIndexOfIsBackedUp = CursorUtil.getColumnIndexOrThrow(_cursor, "isBackedUp");
+          final int _cursorIndexOfCustomName = CursorUtil.getColumnIndexOrThrow(_cursor, "customName");
+          final int _cursorIndexOfDriveFileId = CursorUtil.getColumnIndexOrThrow(_cursor, "driveFileId");
+          final int _cursorIndexOfIsFavorite = CursorUtil.getColumnIndexOrThrow(_cursor, "isFavorite");
+          final int _cursorIndexOfNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "notes");
+          final int _cursorIndexOfTranscription = CursorUtil.getColumnIndexOrThrow(_cursor, "transcription");
+          final int _cursorIndexOfTag = CursorUtil.getColumnIndexOrThrow(_cursor, "tag");
+          final int _cursorIndexOfIsDeleted = CursorUtil.getColumnIndexOrThrow(_cursor, "isDeleted");
+          final int _cursorIndexOfDeletedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "deletedAt");
+          final List<RecordingEntity> _result = new ArrayList<RecordingEntity>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final RecordingEntity _item;
+            _item = new RecordingEntity();
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            _item.setId(_tmpId);
+            final String _tmpFilePath;
+            if (_cursor.isNull(_cursorIndexOfFilePath)) {
+              _tmpFilePath = null;
+            } else {
+              _tmpFilePath = _cursor.getString(_cursorIndexOfFilePath);
+            }
+            _item.setFilePath(_tmpFilePath);
+            final String _tmpContactName;
+            if (_cursor.isNull(_cursorIndexOfContactName)) {
+              _tmpContactName = null;
+            } else {
+              _tmpContactName = _cursor.getString(_cursorIndexOfContactName);
+            }
+            _item.setContactName(_tmpContactName);
+            final String _tmpPhoneNumber;
+            if (_cursor.isNull(_cursorIndexOfPhoneNumber)) {
+              _tmpPhoneNumber = null;
+            } else {
+              _tmpPhoneNumber = _cursor.getString(_cursorIndexOfPhoneNumber);
+            }
+            _item.setPhoneNumber(_tmpPhoneNumber);
+            final boolean _tmpIsIncoming;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfIsIncoming);
+            _tmpIsIncoming = _tmp != 0;
+            _item.setIncoming(_tmpIsIncoming);
+            final long _tmpTimestamp;
+            _tmpTimestamp = _cursor.getLong(_cursorIndexOfTimestamp);
+            _item.setTimestamp(_tmpTimestamp);
+            final long _tmpDuration;
+            _tmpDuration = _cursor.getLong(_cursorIndexOfDuration);
+            _item.setDuration(_tmpDuration);
+            final long _tmpFileSize;
+            _tmpFileSize = _cursor.getLong(_cursorIndexOfFileSize);
+            _item.setFileSize(_tmpFileSize);
+            final boolean _tmpIsEncrypted;
+            final int _tmp_1;
+            _tmp_1 = _cursor.getInt(_cursorIndexOfIsEncrypted);
+            _tmpIsEncrypted = _tmp_1 != 0;
+            _item.setEncrypted(_tmpIsEncrypted);
+            final boolean _tmpIsBackedUp;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfIsBackedUp);
+            _tmpIsBackedUp = _tmp_2 != 0;
+            _item.setBackedUp(_tmpIsBackedUp);
+            final String _tmpCustomName;
+            if (_cursor.isNull(_cursorIndexOfCustomName)) {
+              _tmpCustomName = null;
+            } else {
+              _tmpCustomName = _cursor.getString(_cursorIndexOfCustomName);
+            }
+            _item.setCustomName(_tmpCustomName);
+            final String _tmpDriveFileId;
+            if (_cursor.isNull(_cursorIndexOfDriveFileId)) {
+              _tmpDriveFileId = null;
+            } else {
+              _tmpDriveFileId = _cursor.getString(_cursorIndexOfDriveFileId);
+            }
+            _item.setDriveFileId(_tmpDriveFileId);
+            final boolean _tmpIsFavorite;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsFavorite);
+            _tmpIsFavorite = _tmp_3 != 0;
+            _item.setFavorite(_tmpIsFavorite);
+            final String _tmpNotes;
+            if (_cursor.isNull(_cursorIndexOfNotes)) {
+              _tmpNotes = null;
+            } else {
+              _tmpNotes = _cursor.getString(_cursorIndexOfNotes);
+            }
+            _item.setNotes(_tmpNotes);
+            final String _tmpTranscription;
+            if (_cursor.isNull(_cursorIndexOfTranscription)) {
+              _tmpTranscription = null;
+            } else {
+              _tmpTranscription = _cursor.getString(_cursorIndexOfTranscription);
+            }
+            _item.setTranscription(_tmpTranscription);
+            final String _tmpTag;
+            if (_cursor.isNull(_cursorIndexOfTag)) {
+              _tmpTag = null;
+            } else {
+              _tmpTag = _cursor.getString(_cursorIndexOfTag);
+            }
+            _item.setTag(_tmpTag);
+            final boolean _tmpIsDeleted;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsDeleted);
+            _tmpIsDeleted = _tmp_4 != 0;
+            _item.setDeleted(_tmpIsDeleted);
+            final long _tmpDeletedAt;
+            _tmpDeletedAt = _cursor.getLong(_cursorIndexOfDeletedAt);
+            _item.setDeletedAt(_tmpDeletedAt);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
   }
 
   @NonNull

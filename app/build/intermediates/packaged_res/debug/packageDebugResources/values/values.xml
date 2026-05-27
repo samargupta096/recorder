@@ -2,6 +2,7 @@
 <resources>
     <color name="ic_launcher_background">#3D5AFE</color>
     <string name="about">About</string>
+    <string name="accessibility_service_description">SafeCall requires Accessibility Service to reliably detect active phone calls and capture audio on modern Android devices. We do not collect or share any screen content.</string>
     <string name="app_name">SafeCall Recorder</string>
     <string name="backed_up">Backed up</string>
     <string name="backup_now">Backup Now</string>

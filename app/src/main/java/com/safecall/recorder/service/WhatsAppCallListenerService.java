@@ -147,7 +147,11 @@ public class WhatsAppCallListenerService extends NotificationListenerService {
         intent.setAction(CallRecorderService.ACTION_START_RECORDING);
         intent.putExtra(CallRecorderService.EXTRA_PHONE_NUMBER, "WhatsApp Call"); // Placeholder
         intent.putExtra(CallRecorderService.EXTRA_IS_INCOMING, true); // Assume incoming/generic
-        startForegroundService(intent);
+        try {
+            startForegroundService(intent);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to start WhatsApp recording service", e);
+        }
     }
 
     private void stopRecording() {

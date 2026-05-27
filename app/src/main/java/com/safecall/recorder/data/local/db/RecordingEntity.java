@@ -51,6 +51,18 @@ public class RecordingEntity {
     /** User notes for this recording */
     private String notes = null;
 
+    /** Transcription text generated from audio */
+    private String transcription = null;
+
+    /** Category or tag for organization */
+    private String tag = null;
+
+    /** Recycle bin: whether the file is marked as deleted */
+    private boolean isDeleted = false;
+
+    /** Recycle bin: timestamp when the file was deleted */
+    private long deletedAt = 0;
+
     public RecordingEntity(String filePath, String contactName, String phoneNumber, boolean isIncoming,
             long timestamp, long duration, long fileSize) {
         this.filePath = filePath;
@@ -191,5 +203,37 @@ public class RecordingEntity {
         } else {
             return phoneNumber != null ? phoneNumber : "Unknown";
         }
+    }
+
+    public String getTranscription() {
+        return transcription;
+    }
+
+    public void setTranscription(String transcription) {
+        this.transcription = transcription;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public long getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(long deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

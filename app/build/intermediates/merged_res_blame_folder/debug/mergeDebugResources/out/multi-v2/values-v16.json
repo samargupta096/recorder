@@ -4,7 +4,17 @@
             "outputFile": "com.safecall.recorder.app-mergeDebugResources-46:/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "/home/samarpit/.gradle/caches/9.1.0/transforms/06594bed56b87c2bb5d5f0251d5aee11/transformed/appcompat-1.6.1/res/values-v16/values-v16.xml",
+                    "source": "/home/samarpit/.gradle/caches/9.4.1/transforms/cd8da37c229ebff82d8445155a7adca8/transformed/core-1.12.0/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                },
+                {
+                    "source": "/home/samarpit/.gradle/caches/9.4.1/transforms/d9cd8b8544c0a33553a780b46bd209de/transformed/appcompat-1.6.1/res/values-v16/values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -20,16 +30,6 @@
                         "endLines": "6",
                         "endColumns": "12",
                         "endOffsets": "289"
-                    }
-                },
-                {
-                    "source": "/home/samarpit/.gradle/caches/9.1.0/transforms/608bfdb3dfa19b5a982534590d786a47/transformed/core-1.12.0/res/values-v16/values-v16.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "65",
-                        "endOffsets": "116"
                     }
                 }
             ]

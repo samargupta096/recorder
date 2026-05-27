@@ -18,10 +18,10 @@ import java.util.List;
 public interface RecordingDao {
 
     /**
-     * Get all recordings ordered by timestamp (newest first).
+     * Get all active recordings ordered by timestamp (newest first).
      * Returns LiveData for reactive updates.
      */
-    @Query("SELECT * FROM recordings ORDER BY timestamp DESC")
+    @Query("SELECT * FROM recordings WHERE isDeleted = 0 ORDER BY timestamp DESC")
     LiveData<List<RecordingEntity>> getAllRecordings();
 
     /**
@@ -113,6 +113,24 @@ public interface RecordingDao {
      */
     @Query("SELECT SUM(fileSize) FROM recordings")
     Long getTotalStorageUsed();
+
+    /**
+     * Get all deleted recordings (Recycle Bin).
+     */
+    @Query("SELECT * FROM recordings WHERE isDeleted = 1 ORDER BY deletedAt DESC")
+    LiveData<List<RecordingEntity>> getDeletedRecordings();
+
+    /**
+     * Move a recording to the recycle bin.
+     */
+    @Query("UPDATE recordings SET isDeleted = 1, deletedAt = :timestamp WHERE id = :id")
+    void moveToRecycleBin(long id, long timestamp);
+
+    /**
+     * Restore a recording from the recycle bin.
+     */
+    @Query("UPDATE recordings SET isDeleted = 0, deletedAt = 0 WHERE id = :id")
+    void restoreFromRecycleBin(long id);
 
     /**
      * Delete all recordings (for clear data feature).

@@ -32,6 +32,8 @@ public class PreferencesManager {
     private static final String KEY_BEEP_TONE = "beep_tone";
     private static final String KEY_WHATSAPP_RECORDING = "whatsapp_recording";
     private static final String KEY_LAST_BACKUP = "last_backup";
+    private static final String KEY_AUDIO_SOURCE = "audio_source";
+    private static final String KEY_AUTO_SPEAKER = "auto_speaker";
 
     private final SharedPreferences prefs;
 
@@ -142,6 +144,22 @@ public class PreferencesManager {
 
     public void setWhatsAppRecordingEnabled(boolean enabled) {
         prefs.edit().putBoolean(KEY_WHATSAPP_RECORDING, enabled).apply();
+    }
+
+    public int getAudioSource() {
+        return prefs.getInt(KEY_AUDIO_SOURCE, android.media.MediaRecorder.AudioSource.MIC);
+    }
+
+    public void setAudioSource(int source) {
+        prefs.edit().putInt(KEY_AUDIO_SOURCE, source).apply();
+    }
+
+    public boolean isAutoSpeakerEnabled() {
+        return prefs.getBoolean(KEY_AUTO_SPEAKER, false);
+    }
+
+    public void setAutoSpeakerEnabled(boolean enabled) {
+        prefs.edit().putBoolean(KEY_AUTO_SPEAKER, enabled).apply();
     }
 
     public void clearAll() {

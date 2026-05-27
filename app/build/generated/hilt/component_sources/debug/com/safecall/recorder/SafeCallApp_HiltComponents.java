@@ -4,6 +4,7 @@ import androidx.hilt.work.HiltWrapper_WorkerFactoryModule;
 import com.safecall.recorder.backup.BackupWorker_HiltModule;
 import com.safecall.recorder.di.AppModule;
 import com.safecall.recorder.service.CallRecorderService_GeneratedInjector;
+import com.safecall.recorder.service.CallRecordingAccessibilityService_GeneratedInjector;
 import com.safecall.recorder.service.PhoneCallReceiver_GeneratedInjector;
 import com.safecall.recorder.service.WhatsAppCallListenerService_GeneratedInjector;
 import dagger.Binds;
@@ -152,6 +153,7 @@ public final class SafeCallApp_HiltComponents {
   @Subcomponent
   @ServiceScoped
   public abstract static class ServiceC implements CallRecorderService_GeneratedInjector,
+      CallRecordingAccessibilityService_GeneratedInjector,
       WhatsAppCallListenerService_GeneratedInjector,
       ServiceComponent,
       GeneratedComponent {

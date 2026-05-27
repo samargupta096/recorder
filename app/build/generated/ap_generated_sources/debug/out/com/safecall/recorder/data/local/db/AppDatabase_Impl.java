@@ -31,12 +31,12 @@ public final class AppDatabase_Impl extends AppDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(1) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS `recordings` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `filePath` TEXT, `contactName` TEXT, `phoneNumber` TEXT, `isIncoming` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `fileSize` INTEGER NOT NULL, `isEncrypted` INTEGER NOT NULL, `isBackedUp` INTEGER NOT NULL, `customName` TEXT, `driveFileId` TEXT, `isFavorite` INTEGER NOT NULL, `notes` TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `recordings` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `filePath` TEXT, `contactName` TEXT, `phoneNumber` TEXT, `isIncoming` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `fileSize` INTEGER NOT NULL, `isEncrypted` INTEGER NOT NULL, `isBackedUp` INTEGER NOT NULL, `customName` TEXT, `driveFileId` TEXT, `isFavorite` INTEGER NOT NULL, `notes` TEXT, `transcription` TEXT, `tag` TEXT, `isDeleted` INTEGER NOT NULL, `deletedAt` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4c0a405df82cb196ad9794e1954aba33')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5a05a5178ebb3d02e48bb5f98b2f07f5')");
       }
 
       @Override
@@ -85,7 +85,7 @@ public final class AppDatabase_Impl extends AppDatabase {
       @NonNull
       public RoomOpenHelper.ValidationResult onValidateSchema(
           @NonNull final SupportSQLiteDatabase db) {
-        final HashMap<String, TableInfo.Column> _columnsRecordings = new HashMap<String, TableInfo.Column>(14);
+        final HashMap<String, TableInfo.Column> _columnsRecordings = new HashMap<String, TableInfo.Column>(18);
         _columnsRecordings.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRecordings.put("filePath", new TableInfo.Column("filePath", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRecordings.put("contactName", new TableInfo.Column("contactName", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
@@ -100,6 +100,10 @@ public final class AppDatabase_Impl extends AppDatabase {
         _columnsRecordings.put("driveFileId", new TableInfo.Column("driveFileId", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRecordings.put("isFavorite", new TableInfo.Column("isFavorite", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRecordings.put("notes", new TableInfo.Column("notes", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsRecordings.put("transcription", new TableInfo.Column("transcription", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsRecordings.put("tag", new TableInfo.Column("tag", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsRecordings.put("isDeleted", new TableInfo.Column("isDeleted", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsRecordings.put("deletedAt", new TableInfo.Column("deletedAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysRecordings = new HashSet<TableInfo.ForeignKey>(0);
         final HashSet<TableInfo.Index> _indicesRecordings = new HashSet<TableInfo.Index>(0);
         final TableInfo _infoRecordings = new TableInfo("recordings", _columnsRecordings, _foreignKeysRecordings, _indicesRecordings);
@@ -111,7 +115,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "4c0a405df82cb196ad9794e1954aba33", "57adbbe4c63cc39f469188e447dec331");
+    }, "5a05a5178ebb3d02e48bb5f98b2f07f5", "813e28db66f07118084cab895266d5a8");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

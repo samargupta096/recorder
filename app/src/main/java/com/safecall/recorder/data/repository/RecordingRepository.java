@@ -102,16 +102,36 @@ public class RecordingRepository {
     }
 
     /**
-     * Delete a recording (both file and database entry).
+     * Delete a recording (Soft delete if not already deleted, Hard delete otherwise).
      */
     public void deleteRecording(RecordingEntity recording) {
         executor.execute(() -> {
-            File file = new File(recording.getFilePath());
-            if (file.exists()) {
-                file.delete();
+            if (!recording.isDeleted()) {
+                // Soft delete
+                recordingDao.moveToRecycleBin(recording.getId(), System.currentTimeMillis());
+            } else {
+                // Hard delete
+                File file = new File(recording.getFilePath());
+                if (file.exists()) {
+                    file.delete();
+                }
+                recordingDao.deleteRecording(recording);
             }
-            recordingDao.deleteRecording(recording);
         });
+    }
+
+    /**
+     * Restore a deleted recording.
+     */
+    public void restoreRecording(RecordingEntity recording) {
+        executor.execute(() -> recordingDao.restoreFromRecycleBin(recording.getId()));
+    }
+
+    /**
+     * Get all deleted recordings as LiveData.
+     */
+    public LiveData<List<RecordingEntity>> getDeletedRecordings() {
+        return recordingDao.getDeletedRecordings();
     }
 
     /**
@@ -182,7 +202,8 @@ public class RecordingRepository {
      */
     public StorageStats getStorageStats() {
         int count = recordingDao.getRecordingCount();
-        long totalSize = recordingDao.getTotalStorageUsed();
+        Long totalSizeObj = recordingDao.getTotalStorageUsed();
+        long totalSize = totalSizeObj != null ? totalSizeObj : 0L;
         return new StorageStats(count, totalSize);
     }
 
@@ -219,7 +240,7 @@ public class RecordingRepository {
     /**
      * Resolve contact name from phone number.
      */
-    private String getContactName(String phoneNumber) {
+    public String getContactName(String phoneNumber) {
         try {
             Uri uri = Uri.withAppendedPath(
                     ContactsContract.PhoneLookup.CONTENT_FILTER_URI,

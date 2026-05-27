@@ -79,4 +79,5 @@
     <string name="save">Save</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="accessibility_service_description">SafeCall requires Accessibility Service to reliably detect active phone calls and capture audio on modern Android devices. We do not collect or share any screen content.</string>
 </resources>

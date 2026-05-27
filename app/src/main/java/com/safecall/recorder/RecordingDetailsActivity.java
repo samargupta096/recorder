@@ -2,6 +2,8 @@ package com.safecall.recorder;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.PlaybackParams;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -38,6 +40,7 @@ public class RecordingDetailsActivity extends AppCompatActivity {
     private RecordingEntity recording;
     private File decryptedFile;
     private boolean isPlaying = false;
+    private float currentSpeed = 1.0f;
     private Handler handler = new Handler(Looper.getMainLooper());
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -120,6 +123,9 @@ public class RecordingDetailsActivity extends AppCompatActivity {
 
         // Setup playback controls
         binding.playButton.setOnClickListener(v -> togglePlayback());
+        binding.skipBackwardButton.setOnClickListener(v -> skip(-10000));
+        binding.skipForwardButton.setOnClickListener(v -> skip(10000));
+        binding.speedButton.setOnClickListener(v -> togglePlaybackSpeed());
 
         binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -194,6 +200,45 @@ public class RecordingDetailsActivity extends AppCompatActivity {
             binding.seekBar.setProgress(mediaPlayer.getCurrentPosition());
             binding.currentPosition.setText(formatDuration(mediaPlayer.getCurrentPosition()));
             handler.postDelayed(this::updateSeekBar, 100);
+        }
+    }
+
+    private void skip(int ms) {
+        if (mediaPlayer != null) {
+            int currentPosition = mediaPlayer.getCurrentPosition();
+            int newPosition = Math.max(0, Math.min(mediaPlayer.getDuration(), currentPosition + ms));
+            mediaPlayer.seekTo(newPosition);
+            binding.seekBar.setProgress(newPosition);
+            binding.currentPosition.setText(formatDuration(newPosition));
+        }
+    }
+
+    private void togglePlaybackSpeed() {
+        if (mediaPlayer == null) return;
+        
+        if (currentSpeed == 1.0f) {
+            currentSpeed = 1.5f;
+        } else if (currentSpeed == 1.5f) {
+            currentSpeed = 2.0f;
+        } else {
+            currentSpeed = 1.0f;
+        }
+        
+        binding.speedButton.setText(currentSpeed + "x");
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                PlaybackParams params = mediaPlayer.getPlaybackParams();
+                params.setSpeed(currentSpeed);
+                mediaPlayer.setPlaybackParams(params);
+                if (!isPlaying) {
+                    mediaPlayer.pause();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(this, "Speed control not supported on this device", Toast.LENGTH_SHORT).show();
         }
     }
 

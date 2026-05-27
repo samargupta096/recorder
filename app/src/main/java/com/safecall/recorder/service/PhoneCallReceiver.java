@@ -96,7 +96,11 @@ public class PhoneCallReceiver extends BroadcastReceiver {
         serviceIntent.setAction(CallRecorderService.ACTION_START_RECORDING);
         serviceIntent.putExtra(CallRecorderService.EXTRA_PHONE_NUMBER, phoneNumber);
         serviceIntent.putExtra(CallRecorderService.EXTRA_IS_INCOMING, isIncoming);
-        context.startForegroundService(serviceIntent);
+        try {
+            androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent);
+        } catch (Exception e) {
+            android.util.Log.e("PhoneCallReceiver", "Failed to start recording service", e);
+        }
     }
 
     /**
@@ -105,6 +109,10 @@ public class PhoneCallReceiver extends BroadcastReceiver {
     private void stopRecording(Context context) {
         Intent serviceIntent = new Intent(context, CallRecorderService.class);
         serviceIntent.setAction(CallRecorderService.ACTION_STOP_RECORDING);
-        context.startService(serviceIntent);
+        try {
+            androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent);
+        } catch (Exception e) {
+            android.util.Log.e("PhoneCallReceiver", "Failed to stop recording service", e);
+        }
     }
 }

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +25,13 @@ public final class ActivitySettingsBinding implements ViewBinding {
   private final CoordinatorLayout rootView;
 
   @NonNull
+  public final Spinner audioSourceSpinner;
+
+  @NonNull
   public final SwitchMaterial autoRecordingSwitch;
+
+  @NonNull
+  public final SwitchMaterial autoSpeakerSwitch;
 
   @NonNull
   public final Button backupNowButton;
@@ -57,13 +64,16 @@ public final class ActivitySettingsBinding implements ViewBinding {
   public final SwitchMaterial wifiOnlySwitch;
 
   private ActivitySettingsBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull SwitchMaterial autoRecordingSwitch, @NonNull Button backupNowButton,
+      @NonNull Spinner audioSourceSpinner, @NonNull SwitchMaterial autoRecordingSwitch,
+      @NonNull SwitchMaterial autoSpeakerSwitch, @NonNull Button backupNowButton,
       @NonNull SwitchMaterial biometricSwitch, @NonNull LinearLayout clearDataButton,
       @NonNull TextView googleAccountEmail, @NonNull SwitchMaterial scheduledBackupSwitch,
       @NonNull Button signInButton, @NonNull TextView storageInfo, @NonNull MaterialToolbar toolbar,
       @NonNull SwitchMaterial whatsappRecordingSwitch, @NonNull SwitchMaterial wifiOnlySwitch) {
     this.rootView = rootView;
+    this.audioSourceSpinner = audioSourceSpinner;
     this.autoRecordingSwitch = autoRecordingSwitch;
+    this.autoSpeakerSwitch = autoSpeakerSwitch;
     this.backupNowButton = backupNowButton;
     this.biometricSwitch = biometricSwitch;
     this.clearDataButton = clearDataButton;
@@ -103,9 +113,21 @@ public final class ActivitySettingsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.audio_source_spinner;
+      Spinner audioSourceSpinner = ViewBindings.findChildViewById(rootView, id);
+      if (audioSourceSpinner == null) {
+        break missingId;
+      }
+
       id = R.id.auto_recording_switch;
       SwitchMaterial autoRecordingSwitch = ViewBindings.findChildViewById(rootView, id);
       if (autoRecordingSwitch == null) {
+        break missingId;
+      }
+
+      id = R.id.auto_speaker_switch;
+      SwitchMaterial autoSpeakerSwitch = ViewBindings.findChildViewById(rootView, id);
+      if (autoSpeakerSwitch == null) {
         break missingId;
       }
 
@@ -169,10 +191,10 @@ public final class ActivitySettingsBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivitySettingsBinding((CoordinatorLayout) rootView, autoRecordingSwitch,
-          backupNowButton, biometricSwitch, clearDataButton, googleAccountEmail,
-          scheduledBackupSwitch, signInButton, storageInfo, toolbar, whatsappRecordingSwitch,
-          wifiOnlySwitch);
+      return new ActivitySettingsBinding((CoordinatorLayout) rootView, audioSourceSpinner,
+          autoRecordingSwitch, autoSpeakerSwitch, backupNowButton, biometricSwitch, clearDataButton,
+          googleAccountEmail, scheduledBackupSwitch, signInButton, storageInfo, toolbar,
+          whatsappRecordingSwitch, wifiOnlySwitch);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

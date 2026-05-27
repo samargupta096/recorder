@@ -87,6 +87,21 @@ public class CallRecorderService extends Service {
         String action = intent.getAction();
         Log.d(TAG, "Received action: " + action);
 
+        // Always call startForeground to satisfy startForegroundService requirement
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                startForeground(NOTIFICATION_ID, createNotification(), android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE);
+            } else {
+                startForeground(NOTIFICATION_ID, createNotification());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to start foreground service", e);
+            if (ACTION_START_RECORDING.equals(action)) {
+                stopSelf();
+                return START_NOT_STICKY;
+            }
+        }
+
         if (ACTION_START_RECORDING.equals(action)) {
             currentPhoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER);
             if (currentPhoneNumber == null)
@@ -111,22 +126,7 @@ public class CallRecorderService extends Service {
             return;
         }
 
-        // Start as foreground service with minimal notification
-        try {
-            startForeground(NOTIFICATION_ID, createNotification());
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to start foreground service", e);
-            stopSelf();
-            return;
-        }
-
-        // Try different audio sources in order of preference
-        int audioSource = findBestAudioSource();
-        if (audioSource == -1) {
-            Log.e(TAG, "No audio source available");
-            stopSelf();
-            return;
-        }
+        int audioSource = preferencesManager.getAudioSource();
         Log.d(TAG, "Using audio source: " + audioSource);
 
         try {
@@ -162,7 +162,16 @@ public class CallRecorderService extends Service {
                 recordingsDir.mkdirs();
             }
 
-            String fileName = "recording_" + System.currentTimeMillis() + ".wav";
+            String contactName = repository.getContactName(currentPhoneNumber);
+            String safeName = (contactName != null && !contactName.isEmpty()) ? contactName : currentPhoneNumber;
+            if (safeName == null || safeName.isEmpty()) {
+                safeName = "Unknown";
+            }
+            safeName = safeName.replaceAll("[^a-zA-Z0-9_-]", "_");
+            
+            String dateStr = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(new java.util.Date());
+            String fileName = safeName + "_" + dateStr + ".wav";
+            
             recordingFile = new File(recordingsDir, fileName);
             Log.d(TAG, "Recording to: " + recordingFile.getAbsolutePath());
 
@@ -171,6 +180,17 @@ public class CallRecorderService extends Service {
             // IMPORTANT: Start recording BEFORE starting the write thread!
             audioRecord.startRecording();
             Log.d(TAG, "AudioRecord started");
+
+            if (preferencesManager.isAutoSpeakerEnabled()) {
+                try {
+                    android.media.AudioManager audioManager = (android.media.AudioManager) getSystemService(android.content.Context.AUDIO_SERVICE);
+                    if (audioManager != null) {
+                        audioManager.setSpeakerphoneOn(true);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error enabling speakerphone", e);
+                }
+            }
 
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> android.widget.Toast
                     .makeText(getApplicationContext(), "Recording Started", android.widget.Toast.LENGTH_SHORT).show());
@@ -200,12 +220,22 @@ public class CallRecorderService extends Service {
      * Find the best available audio source for call recording.
      */
     private int findBestAudioSource() {
-        int[] sourcesToTry = {
-                MediaRecorder.AudioSource.VOICE_CALL,
-                MediaRecorder.AudioSource.VOICE_COMMUNICATION,
-                MediaRecorder.AudioSource.VOICE_RECOGNITION,
-                MediaRecorder.AudioSource.MIC
-        };
+        int[] sourcesToTry;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            // Android 10+ restricts VOICE_CALL, initialization might succeed but recording fails/is silent.
+            sourcesToTry = new int[]{
+                    MediaRecorder.AudioSource.MIC,
+                    MediaRecorder.AudioSource.VOICE_RECOGNITION,
+                    MediaRecorder.AudioSource.VOICE_COMMUNICATION
+            };
+        } else {
+            sourcesToTry = new int[]{
+                    MediaRecorder.AudioSource.VOICE_CALL,
+                    MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+                    MediaRecorder.AudioSource.VOICE_RECOGNITION,
+                    MediaRecorder.AudioSource.MIC
+            };
+        }
 
         for (int source : sourcesToTry) {
             if (isAudioSourceAvailable(source)) {
@@ -340,6 +370,17 @@ public class CallRecorderService extends Service {
                 Log.e(TAG, "Error stopping AudioRecord", e);
             }
             audioRecord = null;
+        }
+
+        if (preferencesManager.isAutoSpeakerEnabled()) {
+            try {
+                android.media.AudioManager audioManager = (android.media.AudioManager) getSystemService(android.content.Context.AUDIO_SERVICE);
+                if (audioManager != null) {
+                    audioManager.setSpeakerphoneOn(false);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error disabling speakerphone", e);
+            }
         }
 
         final long duration = System.currentTimeMillis() - recordingStartTime;

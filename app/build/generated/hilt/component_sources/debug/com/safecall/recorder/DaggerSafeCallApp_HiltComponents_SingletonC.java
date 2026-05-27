@@ -29,6 +29,8 @@ import com.safecall.recorder.di.AppModule_ProvideDatabaseFactory;
 import com.safecall.recorder.di.AppModule_ProvideRecordingDaoFactory;
 import com.safecall.recorder.service.CallRecorderService;
 import com.safecall.recorder.service.CallRecorderService_MembersInjector;
+import com.safecall.recorder.service.CallRecordingAccessibilityService;
+import com.safecall.recorder.service.CallRecordingAccessibilityService_MembersInjector;
 import com.safecall.recorder.service.PhoneCallReceiver;
 import com.safecall.recorder.service.PhoneCallReceiver_MembersInjector;
 import com.safecall.recorder.service.WhatsAppCallListenerService;
@@ -434,6 +436,7 @@ public final class DaggerSafeCallApp_HiltComponents_SingletonC {
       MainActivity_MembersInjector.injectRepository(instance, singletonCImpl.recordingRepositoryProvider.get());
       MainActivity_MembersInjector.injectGoogleSignInHelper(instance, singletonCImpl.googleSignInHelperProvider.get());
       MainActivity_MembersInjector.injectDriveBackupManager(instance, singletonCImpl.driveBackupManagerProvider.get());
+      MainActivity_MembersInjector.injectEncryptionManager(instance, singletonCImpl.encryptionManagerProvider.get());
       return instance;
     }
 
@@ -556,6 +559,12 @@ public final class DaggerSafeCallApp_HiltComponents_SingletonC {
     }
 
     @Override
+    public void injectCallRecordingAccessibilityService(
+        CallRecordingAccessibilityService callRecordingAccessibilityService) {
+      injectCallRecordingAccessibilityService2(callRecordingAccessibilityService);
+    }
+
+    @Override
     public void injectWhatsAppCallListenerService(
         WhatsAppCallListenerService whatsAppCallListenerService) {
       injectWhatsAppCallListenerService2(whatsAppCallListenerService);
@@ -566,6 +575,13 @@ public final class DaggerSafeCallApp_HiltComponents_SingletonC {
       CallRecorderService_MembersInjector.injectRepository(instance, singletonCImpl.recordingRepositoryProvider.get());
       CallRecorderService_MembersInjector.injectEncryptionManager(instance, singletonCImpl.encryptionManagerProvider.get());
       CallRecorderService_MembersInjector.injectPreferencesManager(instance, singletonCImpl.preferencesManagerProvider.get());
+      return instance;
+    }
+
+    @CanIgnoreReturnValue
+    private CallRecordingAccessibilityService injectCallRecordingAccessibilityService2(
+        CallRecordingAccessibilityService instance) {
+      CallRecordingAccessibilityService_MembersInjector.injectPreferencesManager(instance, singletonCImpl.preferencesManagerProvider.get());
       return instance;
     }
 

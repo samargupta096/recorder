@@ -3214,6 +3214,7 @@ drawable ic_cloud_done
 drawable ic_cloud_upload
 drawable ic_delete
 drawable ic_edit
+drawable ic_forward_10
 drawable ic_keyboard_black_24dp
 drawable ic_launcher_foreground
 drawable ic_lock
@@ -3227,11 +3228,13 @@ drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
 drawable ic_pause
 drawable ic_play
+drawable ic_replay_10
 drawable ic_search_black_24
 drawable ic_settings
 drawable ic_share
 drawable ic_star
 drawable ic_star_border
+drawable ic_stop
 drawable m3_avd_hide_password
 drawable m3_avd_show_password
 drawable m3_bottom_sheet_drag_handle
@@ -3378,6 +3381,7 @@ id action_menu_presenter
 id action_mode_bar
 id action_mode_bar_stub
 id action_mode_close_button
+id action_recycle_bin
 id action_rename
 id action_settings
 id action_share
@@ -3399,11 +3403,13 @@ id anticipate
 id arc
 id asConfigured
 id async
+id audio_source_spinner
 id auto
 id autoComplete
 id autoCompleteToEnd
 id autoCompleteToStart
 id auto_recording_switch
+id auto_speaker_switch
 id backed_up
 id backed_up_icon
 id backup_now_button
@@ -3419,6 +3425,7 @@ id bounce
 id bounceBoth
 id bounceEnd
 id bounceStart
+id btn_cancel_recording
 id buttonPanel
 id cache_measures
 id callMeasure
@@ -3565,6 +3572,9 @@ id exo_track_selection_view
 id exo_vr
 id expand_activities_button
 id expanded_menu
+id fab_pause_resume
+id fab_record
+id fab_stop_save
 id fade
 id favorite_button
 id favorite_icon
@@ -3808,6 +3818,8 @@ id showTitle
 id sign_in_button
 id sin
 id skipCollapsed
+id skip_backward_button
+id skip_forward_button
 id skipped
 id slide
 id snackbar_action
@@ -3817,6 +3829,7 @@ id snapMargins
 id south
 id spacer
 id special_effects_controller_view_tag
+id speed_button
 id spherical_gl_surface_view
 id spline
 id split_action_bar
@@ -3892,6 +3905,7 @@ id transition_position
 id transition_scene_layoutid_cache
 id transition_transform
 id triangle
+id tv_recording_timer
 id unchecked
 id uniform
 id unlabeled
@@ -4072,6 +4086,7 @@ layout fingerprint_dialog_layout
 layout ime_base_split_test_activity
 layout ime_secondary_split_test_activity
 layout item_recording
+layout layout_recording_bottom_sheet
 layout m3_alert_dialog
 layout m3_alert_dialog_actions
 layout m3_alert_dialog_title
@@ -4178,6 +4193,7 @@ string abc_shareactionprovider_share_with
 string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
 string about
+string accessibility_service_description
 string androidx_startup
 string app_name
 string appbar_scrolling_view_behavior
@@ -5777,6 +5793,7 @@ styleable ViewPager2 android_orientation
 styleable ViewStubCompat android_id android_layout android_inflatedId
 styleable ViewTransition android_id SharedValue SharedValueId clearsTag duration ifTagNotSet ifTagSet motionInterpolator motionTarget onStateTransition pathMotionArc setsTag transitionDisable upDuration viewTransitionMode
 styleable include constraintSet
+xml accessibility_service_config
 xml backup_rules
 xml data_extraction_rules
 xml file_paths

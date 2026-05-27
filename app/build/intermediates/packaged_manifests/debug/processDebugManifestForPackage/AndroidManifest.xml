@@ -15,6 +15,7 @@
 
     <!-- Audio recording permission -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <!-- Storage for recordings -->
     <uses-permission
@@ -30,7 +31,6 @@
     <!-- Foreground service for recording -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
 
     <!-- Boot receiver to restart recording after reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -96,18 +96,22 @@
             android:name="com.safecall.recorder.service.CallRecorderService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="microphone|phoneCall" />
+            android:foregroundServiceType="microphone" />
 
-        <!-- Phone State Receiver -->
-        <receiver
-            android:name="com.safecall.recorder.service.PhoneCallReceiver"
-            android:enabled="true"
-            android:exported="true" >
+        <!-- Accessibility Service for Call Recording -->
+        <service
+            android:name="com.safecall.recorder.service.CallRecordingAccessibilityService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
             <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+                <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
-        </receiver>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
 
         <!-- Boot Completed Receiver -->
         <receiver

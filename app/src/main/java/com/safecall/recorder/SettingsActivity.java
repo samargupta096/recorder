@@ -100,6 +100,40 @@ public class SettingsActivity extends AppCompatActivity {
             preferencesManager.setAutoRecordingEnabled(isChecked);
         });
 
+        // Audio Source Spinner
+        String[] audioSources = {"Microphone (Default)", "Voice Communication", "Voice Recognition"};
+        int[] audioSourceValues = {
+                android.media.MediaRecorder.AudioSource.MIC,
+                android.media.MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+                android.media.MediaRecorder.AudioSource.VOICE_RECOGNITION
+        };
+        android.widget.ArrayAdapter<String> spinnerAdapter = new android.widget.ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, audioSources);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.audioSourceSpinner.setAdapter(spinnerAdapter);
+
+        int currentSource = preferencesManager.getAudioSource();
+        for (int i = 0; i < audioSourceValues.length; i++) {
+            if (audioSourceValues[i] == currentSource) {
+                binding.audioSourceSpinner.setSelection(i);
+                break;
+            }
+        }
+        binding.audioSourceSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                preferencesManager.setAudioSource(audioSourceValues[position]);
+            }
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+
+        // Auto Speakerphone switch
+        binding.autoSpeakerSwitch.setChecked(preferencesManager.isAutoSpeakerEnabled());
+        binding.autoSpeakerSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            preferencesManager.setAutoSpeakerEnabled(isChecked);
+        });
+
         // WhatsApp Recording switch
         binding.whatsappRecordingSwitch.setChecked(preferencesManager.isWhatsAppRecordingEnabled());
         binding.whatsappRecordingSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

@@ -25,6 +25,7 @@ import hilt_aggregated_deps._com_safecall_recorder_SettingsActivity_GeneratedInj
 import hilt_aggregated_deps._com_safecall_recorder_backup_BackupWorker_HiltModule;
 import hilt_aggregated_deps._com_safecall_recorder_di_AppModule;
 import hilt_aggregated_deps._com_safecall_recorder_service_CallRecorderService_GeneratedInjector;
+import hilt_aggregated_deps._com_safecall_recorder_service_CallRecordingAccessibilityService_GeneratedInjector;
 import hilt_aggregated_deps._com_safecall_recorder_service_PhoneCallReceiver_GeneratedInjector;
 import hilt_aggregated_deps._com_safecall_recorder_service_WhatsAppCallListenerService_GeneratedInjector;
 import hilt_aggregated_deps._dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint;
@@ -75,6 +76,7 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_safecall_recorder_backup_BackupWorker_HiltModule.class,
         _com_safecall_recorder_di_AppModule.class,
         _com_safecall_recorder_service_CallRecorderService_GeneratedInjector.class,
+        _com_safecall_recorder_service_CallRecordingAccessibilityService_GeneratedInjector.class,
         _com_safecall_recorder_service_PhoneCallReceiver_GeneratedInjector.class,
         _com_safecall_recorder_service_WhatsAppCallListenerService_GeneratedInjector.class,
         _dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint.class,
